@@ -1,0 +1,40 @@
+from cgitb import html
+import requests
+from bs4 import BeautifulSoup
+
+
+
+url = "https://resultados.as.com/resultados/futbol/champions/equipos/"
+r = requests.get(url)
+html = r.content
+soup = BeautifulSoup(html)
+
+Imagenes = soup.find_all("img", class_ = "img-max-size")
+ListaImagen = []
+for imagen in Imagenes:
+    Escudo = imagen.get("src")
+    HttpsImagen = "https:" + Escudo
+    ListaImagen.append(HttpsImagen)
+
+Nombres = soup.find_all("a", class_ = "col-md-6 col-sm-6 col-xs-6 content-info-escudo")
+ListaNombres = []
+for nombre in Nombres:
+    EquipoS = nombre.get("title")
+    ListaNombres.append(EquipoS)
+
+
+i = 0
+ListaArchivos = []
+for Nombre in ListaNombres:
+    NombreArchivo = ListaNombres[i] + ".jpg"
+    ListaArchivos.append(NombreArchivo)
+    i = i + 1
+
+i = 0 
+
+Diccionario = {}
+for i in range(len(ListaArchivos)):
+  Diccionario[ListaArchivos[i]] = ListaImagen[i]
+
+with open('EquiposChampionsConLogo.txt', 'w') as archivo:
+    archivo.write(str(Diccionario))
